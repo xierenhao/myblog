@@ -118,12 +118,14 @@ const collectionInfo = post.data.collection ? getCollectionBySlug(post.data.coll
           <a href={`/posts/${prevPost.slug}`} class="post-nav-item post-nav-prev">
             <span class="post-nav-label">上一篇</span>
             <span class="post-nav-title">{prevPost.data.title}</span>
+            <span class="post-nav-date">{prevPost.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </a>
         ) : <span class="post-nav-item post-nav-placeholder" />}
         {nextPost ? (
           <a href={`/posts/${nextPost.slug}`} class="post-nav-item post-nav-next">
             <span class="post-nav-label">下一篇</span>
             <span class="post-nav-title">{nextPost.data.title}</span>
+            <span class="post-nav-date">{nextPost.data.date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </a>
         ) : <span class="post-nav-item post-nav-placeholder" />}
       </nav>
@@ -343,6 +345,13 @@ const collectionInfo = post.data.collection ? getCollectionBySlug(post.data.coll
     font-weight: 500;
     color: var(--ink);
     line-height: 1.4;
+  }
+
+  .post-nav-date {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
   }
 
   @media (max-width: 768px) {

@@ -154,6 +154,23 @@ a {
   color: var(--text);
 }
 
+.search-trigger {
+  padding: 16px 0 8px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.search-trigger:hover {
+  color: var(--text);
+}
+
 /* ===== Hero ===== */
 .home-intro {
   padding: 28px 0 24px;
