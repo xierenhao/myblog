@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleRow from '../components/ArticleRow.astro';
-import TopicsSidebar from '../components/TopicsSidebar.astro';
 import { getCollectionsByCategory } from '../data/collections';
 
 export async function getStaticPaths() {
@@ -23,12 +22,6 @@ const posts = allPosts
 const categoryCollections = getCollectionsByCategory(slug);
 const standalonePosts = posts.filter((p) => !p.data.collection);
 const collectionPosts = posts.filter((p) => p.data.collection);
-
-const categoryColors = {
-  ai: '#18c7b7',
-  football: '#f06455',
-  fragments: '#e7b844',
-};
 ---
 
 <BaseLayout title={`${label} · Bruce Xie Blog`} activeNav={`/${slug}`}>
@@ -37,50 +30,47 @@ const categoryColors = {
     <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">{desc}</p>
   </section>
 
-  <div class="content-grid">
-    <section>
-      {categoryCollections.length > 0 && (
-        <div class="section-block">
-          <div class="section-heading">
-            <h2>合辑</h2>
-            <a href="/collections">全部合辑 →</a>
-          </div>
-          <div class="collection-list">
-            {categoryCollections.map((col) => {
-              const colPosts = collectionPosts
-                .filter((p) => p.data.collection === col.slug)
-                .sort((a, b) => (a.data.collectionOrder || 0) - (b.data.collectionOrder || 0));
-              return (
-                <a href={`/collections/${col.slug}`} class="collection-card">
-                  <div class="collection-card-header">
-                    <span class="collection-status">{col.status === 'completed' ? '已完结' : '进行中'}</span>
-                    {col.startDate && <span class="collection-date">{col.startDate} 起</span>}
-                  </div>
-                  <h3 class="collection-title">{col.title}</h3>
-                  <p class="collection-desc">{col.description}</p>
-                  <div class="collection-footer">
-                    <span>{colPosts.length} 篇文章 →</span>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
+  <section class="full-width">
+    {categoryCollections.length > 0 && (
       <div class="section-block">
         <div class="section-heading">
-          <h2>{standalonePosts.length > 0 ? `散篇 · ${standalonePosts.length} 篇` : `${posts.length} 篇文章`}</h2>
+          <h2>合辑</h2>
+          <a href="/collections">全部合辑 →</a>
         </div>
-        <div class="article-list">
-          {standalonePosts.length > 0
-            ? standalonePosts.map((post) => <ArticleRow post={post} />)
-            : posts.map((post) => <ArticleRow post={post} />)}
+        <div class="collection-list">
+          {categoryCollections.map((col) => {
+            const colPosts = collectionPosts
+              .filter((p) => p.data.collection === col.slug)
+              .sort((a, b) => (a.data.collectionOrder || 0) - (b.data.collectionOrder || 0));
+            return (
+              <a href={`/collections/${col.slug}`} class="collection-card">
+                <div class="collection-card-header">
+                  <span class="collection-status">{col.status === 'completed' ? '已完结' : '进行中'}</span>
+                  {col.startDate && <span class="collection-date">{col.startDate} 起</span>}
+                </div>
+                <h3 class="collection-title">{col.title}</h3>
+                <p class="collection-desc">{col.description}</p>
+                <div class="collection-footer">
+                  <span>{colPosts.length} 篇文章 →</span>
+                </div>
+              </a>
+            );
+          })}
         </div>
       </div>
-    </section>
-    <TopicsSidebar />
-  </div>
+    )}
+
+    <div class="section-block">
+      <div class="section-heading">
+        <h2>{standalonePosts.length > 0 ? `散篇 · ${standalonePosts.length} 篇` : `${posts.length} 篇文章`}</h2>
+      </div>
+      <div class="article-list">
+        {standalonePosts.length > 0
+          ? standalonePosts.map((post) => <ArticleRow post={post} />)
+          : posts.map((post) => <ArticleRow post={post} />)}
+      </div>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
@@ -95,7 +85,6 @@ const categoryColors = {
   .collection-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
   }
 
   .collection-card {

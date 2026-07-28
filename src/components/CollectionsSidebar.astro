@@ -1,0 +1,101 @@
+---
+import { getCollection } from 'astro:content';
+import { collections } from '../data/collections';
+
+const allPosts = await getCollection('posts');
+
+const categoryColors = {
+  ai: '#18c7b7',
+  football: '#f06455',
+  fragments: '#e7b844',
+};
+
+const categoryLabels = {
+  ai: 'AI',
+  football: '足球',
+  fragments: '碎片',
+};
+
+const collectionData = collections.map((col) => {
+  const count = allPosts.filter((p) => p.data.collection === col.slug).length;
+  return { ...col, count };
+});
+---
+
+<aside class="topics-block">
+  <h2>推荐合辑</h2>
+  <div class="collection-list">
+    {collectionData.map((col) => (
+      <a href={`/collections/${col.slug}`} class="collection-item">
+        <div class="collection-item-header">
+          <span class="collection-cat" style={`color:${categoryColors[col.category]}`}>{categoryLabels[col.category]}</span>
+          <span class="collection-status">{col.status === 'completed' ? '已完结' : '进行中'}</span>
+        </div>
+        <span class="collection-name">{col.title}</span>
+        <span class="collection-count">{col.count} 篇文章</span>
+      </a>
+    ))}
+  </div>
+  <p class="topics-note">
+    合辑是按主题组织的系列文章，有先后顺序。从这里开始，可以顺着读完一个完整的思考脉络。
+  </p>
+</aside>
+
+<style>
+  .collection-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .collection-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .collection-item:last-child {
+    border-bottom: none;
+  }
+
+  .collection-item:hover {
+    opacity: 0.7;
+  }
+
+  .collection-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .collection-cat {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  .collection-status {
+    font-family: var(--font-serif);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .collection-name {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .collection-count {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: var(--muted);
+  }
+</style>

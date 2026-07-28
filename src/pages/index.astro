@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LeadStory from '../components/LeadStory.astro';
 import ArticleRow from '../components/ArticleRow.astro';
-import TopicsSidebar from '../components/TopicsSidebar.astro';
+import CollectionsSidebar from '../components/CollectionsSidebar.astro';
 
 const allPosts = await getCollection('posts');
 const sorted = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
@@ -35,6 +35,6 @@ const recentPosts = sorted.slice(1, 6);
         {recentPosts.map((post) => <ArticleRow post={post} />)}
       </div>
     </section>
-    <TopicsSidebar />
+    <CollectionsSidebar />
   </div>
 </BaseLayout>

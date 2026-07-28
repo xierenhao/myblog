@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { collections } from '../data/collections';
-import TopicsSidebar from '../components/TopicsSidebar.astro';
 
 const allPosts = await getCollection('posts');
 
@@ -32,39 +31,35 @@ const collectionData = collections.map((col) => {
     <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">按主题组织的系列文章，每篇合辑内的文章有先后顺序。</p>
   </section>
 
-  <div class="content-grid">
-    <section>
-      <div class="section-heading">
-        <h2>{collectionData.length} 个合辑</h2>
-      </div>
-      <div class="collection-list">
-        {collectionData.map((col) => (
-          <a href={`/collections/${col.slug}`} class="collection-card">
-            <div class="collection-card-header">
-              <span class="collection-category-tag" style={`color:${categoryColors[col.category]}`}>
-                {categoryLabels[col.category]}
-              </span>
-              <span class="collection-status">{col.status === 'completed' ? '已完结' : '进行中'}</span>
-            </div>
-            <h3 class="collection-title">{col.title}</h3>
-            <p class="collection-desc">{col.description}</p>
-            <div class="collection-footer">
-              <span>{col.count} 篇文章</span>
-              {col.startDate && <span class="collection-date">{col.startDate} 起</span>}
-            </div>
-          </a>
-        ))}
-      </div>
-    </section>
-    <TopicsSidebar />
-  </div>
+  <section class="full-width">
+    <div class="section-heading">
+      <h2>{collectionData.length} 个合辑</h2>
+    </div>
+    <div class="collection-list">
+      {collectionData.map((col) => (
+        <a href={`/collections/${col.slug}`} class="collection-card">
+          <div class="collection-card-header">
+            <span class="collection-category-tag" style={`color:${categoryColors[col.category]}`}>
+              {categoryLabels[col.category]}
+            </span>
+            <span class="collection-status">{col.status === 'completed' ? '已完结' : '进行中'}</span>
+          </div>
+          <h3 class="collection-title">{col.title}</h3>
+          <p class="collection-desc">{col.description}</p>
+          <div class="collection-footer">
+            <span>{col.count} 篇文章</span>
+            {col.startDate && <span class="collection-date">{col.startDate} 起</span>}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
   .collection-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
   }
 
   .collection-card {

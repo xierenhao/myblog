@@ -267,6 +267,10 @@ a {
   padding-bottom: 48px;
 }
 
+.full-width {
+  padding-bottom: 48px;
+}
+
 /* ===== Article row ===== */
 .article-row-link {
   display: block;

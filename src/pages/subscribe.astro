@@ -1,0 +1,154 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="订阅 · Bruce Xie Blog" activeNav="/subscribe">
+  <article class="subscribe-page">
+    <nav class="post-back">
+      <a href="/">← 返回首页</a>
+    </nav>
+
+    <header class="subscribe-header">
+      <h1>订阅</h1>
+      <p class="subscribe-lead">选择一种方式，不错过更新。</p>
+    </header>
+
+    <div class="subscribe-list">
+      <div class="subscribe-item">
+        <div class="subscribe-item-header">
+          <h2>RSS</h2>
+          <span class="subscribe-status">可用</span>
+        </div>
+        <p class="subscribe-desc">用 RSS 阅读器订阅，文章发布后自动推送。推荐 NetNewsWire（macOS）、Feedly、Inoreader。</p>
+        <div class="subscribe-action">
+          <a href="/rss.xml" class="subscribe-link">/rss.xml →</a>
+        </div>
+      </div>
+
+      <div class="subscribe-item">
+        <div class="subscribe-item-header">
+          <h2>GitHub</h2>
+          <span class="subscribe-status">可用</span>
+        </div>
+        <p class="subscribe-desc">在 GitHub 上 Watch 本仓库，每次推送代码都会收到通知。适合开发者。</p>
+        <div class="subscribe-action">
+          <a href="https://github.com/xierenhao/myblog" class="subscribe-link" target="_blank" rel="noopener">github.com/xierenhao/myblog →</a>
+        </div>
+      </div>
+
+      <div class="subscribe-item">
+        <div class="subscribe-item-header">
+          <h2>邮箱订阅</h2>
+          <span class="subscribe-status-soon">即将开放</span>
+        </div>
+        <p class="subscribe-desc">留下邮箱，新文章发布时收到一封邮件。目前正在评估服务方案。</p>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .subscribe-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 0 64px;
+  }
+
+  .post-back {
+    margin-bottom: 24px;
+    font-family: var(--font-serif);
+    font-size: 13px;
+  }
+
+  .post-back a {
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+
+  .post-back a:hover {
+    color: var(--ink);
+  }
+
+  .subscribe-header {
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .subscribe-header h1 {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .subscribe-lead {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    color: var(--muted);
+  }
+
+  .subscribe-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .subscribe-item {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .subscribe-item:last-child {
+    border-bottom: none;
+  }
+
+  .subscribe-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .subscribe-item-header h2 {
+    font-family: var(--font-serif);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .subscribe-status {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .subscribe-status-soon {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .subscribe-desc {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .subscribe-link {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 2px;
+    transition: text-decoration-color 0.15s;
+  }
+
+  .subscribe-link:hover {
+    text-decoration-color: var(--ink);
+  }
+</style>
