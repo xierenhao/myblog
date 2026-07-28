@@ -12,7 +12,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <div class="section-heading">
       <h2 id="search-count"></h2>
     </div>
-    <div id="search-results-list" class="article-list"></div>
+    <div id="search-results-list" class="sr-list"></div>
   </section>
 </BaseLayout>
 
@@ -27,12 +27,110 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-style: italic;
     color: var(--ink);
   }
-  .search-empty-text {
-    padding: 32px 0;
+
+  /* ===== Search result list ===== */
+  .sr-list {
+    padding-bottom: 32px;
+  }
+
+  .sr-empty {
+    padding: 40px 0;
     font-family: var(--font-serif);
     font-size: 14px;
     color: var(--muted);
     text-align: center;
+  }
+
+  .sr-empty em {
+    font-style: italic;
+    color: var(--ink);
+  }
+
+  .sr-item {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.12s;
+  }
+
+  .sr-item:last-child {
+    border-bottom: none;
+  }
+
+  .sr-item:hover {
+    background: var(--soft);
+    margin: 0 -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .sr-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .sr-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .sr-cat {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .sr-date {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .sr-title {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+    margin-bottom: 6px;
+  }
+
+  .sr-excerpt {
+    font-family: var(--font-serif);
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  .sr-highlight {
+    background: rgba(24, 199, 183, 0.15);
+    color: var(--ink);
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+
+  .sr-error {
+    padding: 40px 0;
+    font-family: var(--font-serif);
+    font-size: 14px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .sr-error-detail {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    font-family: var(--font-mono);
   }
 </style>
 
@@ -51,51 +149,61 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       return;
     }
 
-    queryDisplay.innerHTML = `关键词：<em>"${escapeHtml(q)}"</em>`;
+    queryDisplay.innerHTML = `关键词：<em>"${escHtml(q)}"</em>`;
     countEl.textContent = '搜索中...';
 
     try {
       const res = await fetch('/search-index.json');
-      const index = await res.json();
-      const parsed = parseQuery(q);
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+      const text = await res.text();
+      let index: any[];
+      try {
+        index = JSON.parse(text);
+      } catch (parseErr) {
+        console.error('JSON parse error:', parseErr);
+        throw new Error('搜索数据格式错误');
+      }
+
+      const parsed = parseQ(q);
       const matched = index
-        .map((p) => ({ post: p, score: matchScore(p, parsed) }))
-        .filter((r) => r.score > 0)
-        .sort((a, b) => b.score - a.score);
+        .map((p: any) => ({ post: p, score: scoreQ(p, parsed) }))
+        .filter((r: any) => r.score > 0)
+        .sort((a: any, b: any) => b.score - a.score);
 
       countEl.textContent = `${matched.length} 篇文章`;
 
       if (matched.length === 0) {
-        listEl.innerHTML = `<div class="search-empty-text">没有找到匹配 "${escapeHtml(q)}" 的文章</div>`;
+        listEl.innerHTML = `<div class="sr-empty">没有找到匹配 <em>"${escHtml(q)}"</em> 的文章</div>`;
         return;
       }
 
-      listEl.innerHTML = matched.map(({ post }) => `
-        <a href="/posts/${escapeHtml(post.slug)}" class="article-row-link">
-          <article class="article-row">
-            <div class="cover cover-sm">
-              ${post.coverSvg}
-              <span class="cover-label">${escapeHtml(categoryLabel(post.category))}</span>
-            </div>
-            <div class="article-row-copy">
-              <h4>${escapeHtml(post.title)}</h4>
-              <p>${escapeHtml(post.excerpt)}</p>
-            </div>
-            <time>${escapeHtml(post.dateShort)}</time>
-          </article>
-        </a>
-      `).join('');
-    } catch (e) {
-      countEl.textContent = '搜索出错';
-      listEl.innerHTML = '';
+      const catColors: Record<string, string> = { ai: '#18c7b7', football: '#f06455', fragments: '#e7b844' };
+      const catLabels: Record<string, string> = { ai: 'AI', football: '足球', fragments: '碎片' };
+
+      listEl.innerHTML = matched.map(({ post }: any) => {
+        const cat = catLabels[post.category] || post.category;
+        const color = catColors[post.category] || '#666';
+        const excerpt = highlightTerms(escHtml(post.excerpt), parsed.include);
+        return `<a href="/posts/${escHtml(post.slug)}" class="sr-item">
+          <div class="sr-meta">
+            <span class="sr-dot" style="background:${color}"></span>
+            <span class="sr-cat" style="color:${color}">${escHtml(cat)}</span>
+            <span class="sr-date">${escHtml(post.dateShort)}</span>
+          </div>
+          <div class="sr-title">${highlightTerms(escHtml(post.title), parsed.include)}</div>
+          <div class="sr-excerpt">${excerpt}</div>
+        </a>`;
+      }).join('');
+    } catch (e: any) {
+      console.error('Search error:', e);
+      countEl.textContent = '';
+      listEl.innerHTML = `<div class="sr-error">搜索出错<div class="sr-error-detail">${escHtml(e.message || String(e))}</div></div>`;
     }
   }
 
-  function categoryLabel(c) {
-    return { ai: 'AI', football: '足球', fragments: '碎片' }[c] || c;
-  }
-
-  function escapeHtml(s) {
+  function escHtml(s: string): string {
     return s
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -104,8 +212,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       .replace(/'/g, '&#39;');
   }
 
-  function parseQuery(raw) {
-    const tokens = [];
+  function highlightTerms(html: string, terms: string[]): string {
+    if (!terms.length) return html;
+    // Highlight matching terms in the already-escaped HTML
+    let result = html;
+    for (const term of terms) {
+      if (!term) continue;
+      // Match the term in escaped HTML (case-insensitive)
+      const escapedTerm = escHtml(term);
+      const regex = new RegExp(escapedTerm, 'gi');
+      result = result.replace(regex, `<span class="sr-highlight">${escapedTerm}</span>`);
+    }
+    return result;
+  }
+
+  function parseQ(raw: string): { include: string[]; exclude: string[] } {
+    const tokens: string[] = [];
     let cur = '';
     let inQuote = false;
     for (let i = 0; i < raw.length; i++) {
@@ -120,8 +242,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     }
     if (cur) tokens.push(cur);
 
-    const include = [];
-    const exclude = [];
+    const include: string[] = [];
+    const exclude: string[] = [];
     for (const t of tokens) {
       if (t.startsWith('-') && t.length > 1) exclude.push(t.slice(1).toLowerCase());
       else include.push(t.toLowerCase());
@@ -129,7 +251,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     return { include, exclude };
   }
 
-  function matchScore(post, q) {
+  function scoreQ(post: any, q: { include: string[]; exclude: string[] }): number {
     const haystack = `${post.title} ${post.excerpt} ${post.content} ${post.category}`.toLowerCase();
     for (const e of q.exclude) {
       if (haystack.includes(e)) return 0;
