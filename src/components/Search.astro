@@ -10,26 +10,9 @@
           <line x1="10.5" y1="10.5" x2="14" y2="14" stroke-linecap="round" />
         </svg>
       </span>
-      <input id="search-input" type="text" placeholder="搜索..." autocomplete="off" spellcheck="false" />
+      <input id="search-input" type="text" placeholder="搜索文章…" autocomplete="off" spellcheck="false" />
       <button class="search-esc" type="button" id="search-esc">ESC</button>
     </div>
-
-    <div class="search-tips">
-      <p class="search-tips-label">搜索技巧</p>
-      <div class="search-tip-row">
-        <code class="search-tip-code">"exact phrase"</code>
-        <span class="search-tip-text">加引号精确匹配短语（<code class="search-tip-inline">"</code> 表示精确匹配）</span>
-      </div>
-      <div class="search-tip-row">
-        <code class="search-tip-code">word1 word2</code>
-        <span class="search-tip-text">使用空格组合关键词（空格表示 <code class="search-tip-inline">AND</code>）</span>
-      </div>
-      <div class="search-tip-row">
-        <code class="search-tip-code">-word</code>
-        <span class="search-tip-text">排除关键词（<code class="search-tip-inline">-</code> 表示排除）</span>
-      </div>
-    </div>
-
     <div id="search-results" class="search-results"></div>
   </div>
 </div>
@@ -38,26 +21,22 @@
   .search-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.35);
     display: none;
-    align-items: flex-start;
-    justify-content: center;
     z-index: 1000;
-    padding-top: 10vh;
   }
 
   .search-overlay.open {
-    display: flex;
+    display: block;
   }
 
   .search-panel {
     background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    width: min(640px, 92vw);
-    max-height: 75vh;
+    border-bottom: 1px solid var(--line);
+    width: 100%;
+    max-height: 70vh;
     overflow: auto;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
   }
 
   .search-input-row {
@@ -65,8 +44,10 @@
     grid-template-columns: 32px 1fr auto;
     align-items: center;
     gap: 12px;
-    padding: 16px 20px;
+    padding: 14px 0;
     border-bottom: 1px solid var(--line);
+    width: min(var(--shell-width), 100% - calc(var(--shell-padding) * 2));
+    margin: 0 auto;
   }
 
   .search-icon {
@@ -112,120 +93,41 @@
     color: var(--ink);
   }
 
-  .search-tips {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .search-tips-label {
-    font-family: var(--font-serif);
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 10px;
-    letter-spacing: 0.05em;
-  }
-
-  .search-tip-row {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    padding: 4px 0;
-    font-family: var(--font-serif);
-    font-size: 13px;
-  }
-
-  .search-tip-code {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    color: #18c7b7;
-    background: rgba(24, 199, 183, 0.08);
-    border: 1px solid rgba(24, 199, 183, 0.25);
-    border-radius: 3px;
-    padding: 1px 8px;
-    white-space: nowrap;
-  }
-
-  .search-tip-text {
-    color: var(--text);
-    line-height: 1.5;
-  }
-
-  .search-tip-inline {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: #18c7b7;
-    background: rgba(24, 199, 183, 0.06);
-    border-radius: 2px;
-    padding: 0 4px;
-  }
-
   .search-results {
-    padding: 8px 0;
-    min-height: 60px;
+    width: min(var(--shell-width), 100% - calc(var(--shell-padding) * 2));
+    margin: 0 auto;
+    padding: 4px 0 8px;
   }
 
-  .search-result-item {
-    display: block;
-    padding: 12px 20px;
-    text-decoration: none;
-    border-bottom: 1px solid var(--line);
-    transition: background 0.1s;
-  }
-
-  .search-result-item:last-child {
+  .search-results .article-row-link:last-child {
     border-bottom: none;
   }
 
-  .search-result-item:hover {
-    background: var(--soft);
-  }
-
-  .search-result-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--font-serif);
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-
-  .search-result-cat {
-    font-weight: 500;
-    letter-spacing: 0.03em;
-  }
-
-  .search-result-title {
-    font-family: var(--font-serif);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--ink);
-    margin-bottom: 3px;
-    line-height: 1.4;
-  }
-
-  .search-result-excerpt {
+  .search-view-all {
+    display: block;
+    padding: 14px 0 6px;
     font-family: var(--font-serif);
     font-size: 12px;
     color: var(--muted);
-    line-height: 1.5;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    text-align: center;
+    transition: color 0.15s;
   }
 
-  .search-empty {
-    padding: 24px 20px;
+  .search-view-all:hover {
+    color: var(--ink);
+  }
+
+  .search-empty-inline {
+    padding: 24px 0;
     font-family: var(--font-serif);
     font-size: 13px;
     color: var(--muted);
     text-align: center;
   }
 
-  .search-empty-query {
-    color: var(--ink);
+  .search-empty-inline em {
     font-style: italic;
+    color: var(--ink);
   }
 </style>
 
@@ -241,11 +143,12 @@
   async function loadIndex() {
     if (index.length > 0) return index;
     const res = await fetch('/search-index.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     index = await res.json();
     return index;
   }
 
-  function escapeHtml(s: string) {
+  function escHtml(s: string) {
     return s
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -254,19 +157,13 @@
       .replace(/'/g, '&#39;');
   }
 
-  const categoryColors: Record<string, string> = {
-    ai: '#18c7b7',
-    football: '#f06455',
-    fragments: '#e7b844',
-  };
-
   const categoryLabels: Record<string, string> = {
     ai: 'AI',
     football: '足球',
     fragments: '碎片',
   };
 
-  function parseQuery(raw: string): { include: string[]; exclude: string[]; exact: string[] } {
+  function parseQuery(raw: string): { include: string[]; exclude: string[] } {
     const tokens: string[] = [];
     let cur = '';
     let inQuote = false;
@@ -284,34 +181,32 @@
 
     const include: string[] = [];
     const exclude: string[] = [];
-    const exact: string[] = [];
     for (const t of tokens) {
       if (t.startsWith('-') && t.length > 1) exclude.push(t.slice(1).toLowerCase());
-      else exact.push(t.toLowerCase());
-      include.push(t.toLowerCase());
+      else include.push(t.toLowerCase());
     }
-    return { include, exclude, exact };
+    return { include, exclude };
   }
 
-  function match(post: any, q: { include: string[]; exclude: string[]; exact: string[] }): number {
+  function matchScore(post: any, q: { include: string[]; exclude: string[] }): number {
     const haystack = `${post.title} ${post.excerpt} ${post.content} ${post.category}`.toLowerCase();
     for (const e of q.exclude) {
       if (haystack.includes(e)) return 0;
     }
     let score = 0;
+    let titleMatched = false;
     for (const term of q.include) {
       if (!term) continue;
       const idx = haystack.indexOf(term);
       if (idx === -1) return 0;
       score += 10;
-      if (post.title.toLowerCase().includes(term)) score += 20;
+      if (post.title.toLowerCase().includes(term)) {
+        score += 20;
+        titleMatched = true;
+      }
       if (post.title.toLowerCase().indexOf(term) === 0) score += 10;
     }
-    for (const term of q.exact) {
-      if (term.includes(' ') || /\p{Script=Han}/u.test(term)) {
-        if (haystack.includes(term)) score += 30;
-      }
-    }
+    if (titleMatched) score += 5;
     return score;
   }
 
@@ -329,38 +224,38 @@
     }
 
     const matched = index
-      .map((p) => ({ post: p, score: match(p, parsed) }))
+      .map((p) => ({ post: p, score: matchScore(p, parsed) }))
       .filter((r) => r.score > 0)
       .sort((a, b) => b.score - a.score)
-      .slice(0, 8);
+      .slice(0, 5);
 
     if (matched.length === 0) {
-      results.innerHTML = `<div class="search-empty">没有找到匹配 <span class="search-empty-query">"${escapeHtml(trimmed)}"</span> 的文章</div>`;
+      results.innerHTML = `<div class="search-empty-inline">没有找到匹配 <em>"${escHtml(trimmed)}"</em> 的文章</div>`;
       return;
     }
 
-    const catColor = (c: string) => categoryColors[c] || '#666';
-    const catLabel = (c: string) => categoryLabels[c] || c;
-    const dateStr = (d: string) => new Date(d).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-
-    results.innerHTML = matched
-      .map(({ post }) => {
-        const cat = catLabel(post.category);
-        const color = catColor(post.category);
-        return `<a href="/posts/${escapeHtml(post.slug)}" class="search-result-item">
-          <div class="search-result-meta">
-            <span class="search-result-cat" style="color:${color}">${escapeHtml(cat)}</span>
-            <span>${escapeHtml(dateStr(post.date))}</span>
+    const html = matched.map(({ post }) => {
+      const catLabel = categoryLabels[post.category] || post.category;
+      return `<a href="/posts/${escHtml(post.slug)}" class="article-row-link">
+        <article class="article-row">
+          <div class="cover cover-sm">
+            ${post.coverSvg}
+            <span class="cover-label">${escHtml(catLabel)}</span>
           </div>
-          <div class="search-result-title">${escapeHtml(post.title)}</div>
-          <div class="search-result-excerpt">${escapeHtml(post.excerpt)}</div>
-        </a>`;
-      })
-      .join('');
+          <div class="article-row-copy">
+            <h4>${escHtml(post.title)}</h4>
+            <p>${escHtml(post.excerpt)}</p>
+          </div>
+          <time>${escHtml(post.dateShort)}</time>
+        </article>
+      </a>`;
+    }).join('');
+
+    results.innerHTML = html + `<a href="/search?q=${encodeURIComponent(trimmed)}" class="search-view-all">查看全部结果 →</a>`;
   }
 
   function openOverlay() {
-    loadIndex();
+    loadIndex().catch(e => console.error('Search index load error:', e));
     if (!overlay || !input) return;
     overlay.classList.add('open');
     overlay.setAttribute('aria-hidden', 'false');
