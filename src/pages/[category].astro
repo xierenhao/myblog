@@ -100,16 +100,21 @@ const categoryColors = {
 
   .collection-card {
     display: block;
-    padding: 18px 22px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    transition: border-color 0.15s, background 0.15s;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.1s;
     text-decoration: none;
   }
 
+  .collection-card:last-child {
+    border-bottom: none;
+  }
+
   .collection-card:hover {
-    border-color: var(--muted);
     background: var(--soft);
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .collection-card-header {
