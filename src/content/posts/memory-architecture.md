@@ -6,6 +6,8 @@ excerpt: '长周期 agent 的记忆不是「存更多」，而是「忘得对」
 subtitle: "长周期 agent 的记忆架构"
 series: "harness"
 seriesOrder: 3
+collection: "harness"
+collectionOrder: 3
 coverMotif: "strata"
 tags: ["harness", "memory", "agent"]
 ---

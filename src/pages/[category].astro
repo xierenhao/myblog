@@ -3,11 +3,12 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleRow from '../components/ArticleRow.astro';
 import TopicsSidebar from '../components/TopicsSidebar.astro';
+import { getCollectionsByCategory } from '../data/collections';
 
 export async function getStaticPaths() {
   const categories = [
     { slug: 'ai', label: 'AI', desc: '关于 harness、agent、context window 的产品思考。' },
-    { slug: 'football', label: '足球', desc: '2026 世界杯战术复盘与数据分析。' },
+    { slug: 'football', label: '足球', desc: '世界杯战术复盘、野球笔记与踢球思考。' },
     { slug: 'fragments', label: '碎片', desc: '社媒精选与周度摘录。' },
   ];
   return categories.map((c) => ({ params: { category: c.slug }, props: c }));
@@ -18,6 +19,16 @@ const allPosts = await getCollection('posts');
 const posts = allPosts
   .filter((p) => p.data.category === slug)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const categoryCollections = getCollectionsByCategory(slug);
+const standalonePosts = posts.filter((p) => !p.data.collection);
+const collectionPosts = posts.filter((p) => p.data.collection);
+
+const categoryColors = {
+  ai: '#18c7b7',
+  football: '#f06455',
+  fragments: '#e7b844',
+};
 ---
 
 <BaseLayout title={`${label} · Bruce Xie Blog`} activeNav={`/${slug}`}>
@@ -28,13 +39,116 @@ const posts = allPosts
 
   <div class="content-grid">
     <section>
-      <div class="section-heading">
-        <h2>{posts.length} 篇文章</h2>
-      </div>
-      <div class="article-list">
-        {posts.map((post) => <ArticleRow post={post} />)}
+      {categoryCollections.length > 0 && (
+        <div class="section-block">
+          <div class="section-heading">
+            <h2>合辑</h2>
+            <a href="/collections">全部合辑 →</a>
+          </div>
+          <div class="collection-list">
+            {categoryCollections.map((col) => {
+              const colPosts = collectionPosts
+                .filter((p) => p.data.collection === col.slug)
+                .sort((a, b) => (a.data.collectionOrder || 0) - (b.data.collectionOrder || 0));
+              return (
+                <a href={`/collections/${col.slug}`} class="collection-card">
+                  <div class="collection-card-header">
+                    <span class="collection-status">{col.status === 'completed' ? '已完结' : '进行中'}</span>
+                    {col.startDate && <span class="collection-date">{col.startDate} 起</span>}
+                  </div>
+                  <h3 class="collection-title">{col.title}</h3>
+                  <p class="collection-desc">{col.description}</p>
+                  <div class="collection-footer">
+                    <span>{colPosts.length} 篇文章 →</span>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div class="section-block">
+        <div class="section-heading">
+          <h2>{standalonePosts.length > 0 ? `散篇 · ${standalonePosts.length} 篇` : `${posts.length} 篇文章`}</h2>
+        </div>
+        <div class="article-list">
+          {standalonePosts.length > 0
+            ? standalonePosts.map((post) => <ArticleRow post={post} />)
+            : posts.map((post) => <ArticleRow post={post} />)}
+        </div>
       </div>
     </section>
     <TopicsSidebar />
   </div>
 </BaseLayout>
+
+<style>
+  .section-block {
+    margin-bottom: 48px;
+  }
+
+  .section-block:last-child {
+    margin-bottom: 0;
+  }
+
+  .collection-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .collection-card {
+    display: block;
+    padding: 18px 22px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    transition: border-color 0.15s, background 0.15s;
+    text-decoration: none;
+  }
+
+  .collection-card:hover {
+    border-color: var(--muted);
+    background: var(--soft);
+  }
+
+  .collection-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .collection-status {
+    color: var(--muted);
+  }
+
+  .collection-date {
+    font-style: italic;
+  }
+
+  .collection-title {
+    font-family: var(--font-serif);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .collection-desc {
+    font-family: var(--font-serif);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .collection-footer {
+    font-family: var(--font-serif);
+    font-size: 12px;
+    color: var(--muted);
+  }
+</style>

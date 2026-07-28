@@ -6,6 +6,8 @@ excerpt: "从产品经理视角拆解 tools、memory、planning 三层结构，�
 subtitle: "为什么 agent 的脚手架比模型本身更重要"
 series: "harness"
 seriesOrder: 1
+collection: "harness"
+collectionOrder: 1
 coverKeyword: "LOOP"
 coverMotif: "loop"
 tags: ["harness", "agent", "产品"]

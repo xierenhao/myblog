@@ -6,6 +6,8 @@ excerpt: "上下文窗口不是技术参数，而是产品经理需要设计的�
 subtitle: "上下文窗口是产品界面"
 series: "harness"
 seriesOrder: 2
+collection: "harness"
+collectionOrder: 2
 coverKeyword: "CONTEXT"
 coverMotif: "viewfinder"
 tags: ["harness", "context", "产品"]

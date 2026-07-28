@@ -6,6 +6,8 @@ excerpt: "法国队半决赛不敌西班牙，止步四强。这不是一次比�
 subtitle: "从选材到临场，一支靠个人能力硬撑的球队"
 series: "2026 世界杯复盘"
 seriesOrder: 1
+collection: "world-cup-2026"
+collectionOrder: 1
 coverData: [62, 58, 55, 48, 41, 35]
 coverMotif: "curve"
 tags: ["世界杯", "法国队", "战术分析"]

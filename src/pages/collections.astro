@@ -1,0 +1,132 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { collections } from '../data/collections';
+import TopicsSidebar from '../components/TopicsSidebar.astro';
+
+const allPosts = await getCollection('posts');
+
+const categoryColors = {
+  ai: '#18c7b7',
+  football: '#f06455',
+  fragments: '#e7b844',
+};
+
+const categoryLabels = {
+  ai: 'AI',
+  football: '足球',
+  fragments: '碎片',
+};
+
+const collectionData = collections.map((col) => {
+  const posts = allPosts
+    .filter((p) => p.data.collection === col.slug)
+    .sort((a, b) => (a.data.collectionOrder || 0) - (b.data.collectionOrder || 0));
+  return { ...col, posts, count: posts.length };
+});
+---
+
+<BaseLayout title="合辑 · Bruce Xie Blog" activeNav="/collections">
+  <section class="home-intro">
+    <h1>合辑</h1>
+    <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">按主题组织的系列文章，每篇合辑内的文章有先后顺序。</p>
+  </section>
+
+  <div class="content-grid">
+    <section>
+      <div class="section-heading">
+        <h2>{collectionData.length} 个合辑</h2>
+      </div>
+      <div class="collection-list">
+        {collectionData.map((col) => (
+          <a href={`/collections/${col.slug}`} class="collection-card">
+            <div class="collection-card-header">
+              <span class="collection-category-tag" style={`color:${categoryColors[col.category]}`}>
+                {categoryLabels[col.category]}
+              </span>
+              <span class="collection-status">{col.status === 'completed' ? '已完结' : '进行中'}</span>
+            </div>
+            <h3 class="collection-title">{col.title}</h3>
+            <p class="collection-desc">{col.description}</p>
+            <div class="collection-footer">
+              <span>{col.count} 篇文章</span>
+              {col.startDate && <span class="collection-date">{col.startDate} 起</span>}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+    <TopicsSidebar />
+  </div>
+</BaseLayout>
+
+<style>
+  .collection-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .collection-card {
+    display: block;
+    padding: 20px 24px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    transition: border-color 0.15s, background 0.15s;
+    text-decoration: none;
+  }
+
+  .collection-card:hover {
+    border-color: var(--muted);
+    background: var(--soft);
+  }
+
+  .collection-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .collection-category-tag {
+    font-family: var(--font-serif);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  .collection-status {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .collection-title {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .collection-desc {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .collection-footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--font-serif);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .collection-date {
+    font-style: italic;
+  }
+</style>

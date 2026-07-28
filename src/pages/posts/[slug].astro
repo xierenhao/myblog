@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArticleCover from '../../components/ArticleCover.astro';
+import { getCollectionBySlug } from '../../data/collections';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -14,6 +15,8 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await post.render();
 const { title, date, category, excerpt, subtitle, series, seriesOrder } = post.data;
+
+const allPosts = await getCollection('posts');
 
 const categoryColors = {
   ai: '#18c7b7',
@@ -51,13 +54,43 @@ const chineseChars = (stripped.match(/[\u4e00-\u9fa5]/g) || []).length;
 const otherTokens = (stripped.match(/[a-zA-Z0-9]+/g) || []).length;
 const wordCount = chineseChars + otherTokens;
 const readingTime = Math.max(1, Math.round(wordCount / 350));
+
+// Determine prev/next
+let prevPost = null;
+let nextPost = null;
+
+if (post.data.collection) {
+  // Navigate within collection by collectionOrder
+  const collectionPosts = allPosts
+    .filter((p) => p.data.collection === post.data.collection)
+    .sort((a, b) => (a.data.collectionOrder || 0) - (b.data.collectionOrder || 0));
+  const currentIndex = collectionPosts.findIndex((p) => p.slug === post.slug);
+  if (currentIndex > 0) prevPost = collectionPosts[currentIndex - 1];
+  if (currentIndex < collectionPosts.length - 1) nextPost = collectionPosts[currentIndex + 1];
+} else {
+  // Navigate within same category by date
+  const categoryPosts = allPosts
+    .filter((p) => p.data.category === category && !p.data.collection)
+    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  const currentIndex = categoryPosts.findIndex((p) => p.slug === post.slug);
+  if (currentIndex > 0) prevPost = categoryPosts[currentIndex - 1];
+  if (currentIndex < categoryPosts.length - 1) nextPost = categoryPosts[currentIndex + 1];
+}
+
+const collectionInfo = post.data.collection ? getCollectionBySlug(post.data.collection) : null;
 ---
 
 <BaseLayout title={`${title} · Bruce Xie Blog`} activeNav={`/${category}`}>
   <article class="post-article">
     <nav class="post-back">
       <a href="/articles">← 返回</a>
-      <a href={`/${category}`} class="post-back-category" style={`color:${categoryColors[category]}`}>{categoryLabels[category]}</a>
+      {collectionInfo ? (
+        <a href={`/collections/${collectionInfo.slug}`} class="post-back-collection" style={`color:${categoryColors[category]}`}>
+          {collectionInfo.title}
+        </a>
+      ) : (
+        <a href={`/${category}`} class="post-back-category" style={`color:${categoryColors[category]}`}>{categoryLabels[category]}</a>
+      )}
     </nav>
 
     <div class="post-cover-wrap">
@@ -78,6 +111,23 @@ const readingTime = Math.max(1, Math.round(wordCount / 350));
     <div class="post-content">
       <Content />
     </div>
+
+    {(prevPost || nextPost) && (
+      <nav class="post-nav">
+        {prevPost ? (
+          <a href={`/posts/${prevPost.slug}`} class="post-nav-item post-nav-prev">
+            <span class="post-nav-label">上一篇</span>
+            <span class="post-nav-title">{prevPost.data.title}</span>
+          </a>
+        ) : <span class="post-nav-item post-nav-placeholder" />}
+        {nextPost ? (
+          <a href={`/posts/${nextPost.slug}`} class="post-nav-item post-nav-next">
+            <span class="post-nav-label">下一篇</span>
+            <span class="post-nav-title">{nextPost.data.title}</span>
+          </a>
+        ) : <span class="post-nav-item post-nav-placeholder" />}
+      </nav>
+    )}
   </article>
 </BaseLayout>
 
@@ -100,7 +150,8 @@ const readingTime = Math.max(1, Math.round(wordCount / 350));
     color: var(--ink);
   }
 
-  .post-back-category {
+  .post-back-category,
+  .post-back-collection {
     font-weight: 500;
     letter-spacing: 0.03em;
   }
@@ -249,6 +300,51 @@ const readingTime = Math.max(1, Math.round(wordCount / 350));
     color: var(--ink);
   }
 
+  .post-nav {
+    display: flex;
+    gap: 16px;
+    margin-top: 56px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+
+  .post-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .post-nav-item:hover {
+    opacity: 0.7;
+  }
+
+  .post-nav-placeholder {
+    visibility: hidden;
+  }
+
+  .post-nav-next {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .post-nav-label {
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .post-nav-title {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
   @media (max-width: 768px) {
     .post-article {
       padding: 20px 0 48px;
@@ -265,6 +361,16 @@ const readingTime = Math.max(1, Math.round(wordCount / 350));
 
     .post-cover-wrap .cover {
       height: 100px;
+    }
+
+    .post-nav {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .post-nav-next {
+      text-align: left;
+      align-items: flex-start;
     }
   }
 </style>

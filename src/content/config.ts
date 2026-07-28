@@ -10,6 +10,8 @@ const posts = defineCollection({
     subtitle: z.string().optional(),
     series: z.string().optional(),
     seriesOrder: z.number().optional(),
+    collection: z.string().optional(),
+    collectionOrder: z.number().optional(),
     coverIcon: z.string().optional(),
     coverTimeline: z.number().optional(),
     coverKeyword: z.string().optional(),

@@ -1,0 +1,254 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCover from '../../components/ArticleCover.astro';
+import { collections, getCollectionBySlug } from '../../data/collections';
+
+export async function getStaticPaths() {
+  return collections.map((col) => ({
+    params: { slug: col.slug },
+    props: { collection: col },
+  }));
+}
+
+const { collection } = Astro.props;
+const allPosts = await getCollection('posts');
+
+const posts = allPosts
+  .filter((p) => p.data.collection === collection.slug)
+  .sort((a, b) => (a.data.collectionOrder || 0) - (b.data.collectionOrder || 0));
+
+const categoryColors = {
+  ai: '#18c7b7',
+  football: '#f06455',
+  fragments: '#e7b844',
+};
+
+const categoryLabels = {
+  ai: 'AI',
+  football: '足球',
+  fragments: '碎片',
+};
+
+const dateStr = (date: Date) => date.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+// Word count helper
+function wordCount(body: string) {
+  const stripped = (body || '')
+    .replace(/^---[\s\S]+?---/, '')
+    .replace(/```[\s\S]+?```/g, ' ')
+    .replace(/`[^`]+`/g, ' ')
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[#>*_~|\-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const chinese = (stripped.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const other = (stripped.match(/[a-zA-Z0-9]+/g) || []).length;
+  return chinese + other;
+}
+---
+
+<BaseLayout title={`${collection.title} · 合辑 · Bruce Xie Blog`} activeNav="/collections">
+  <article class="collection-page">
+    <nav class="post-back">
+      <a href="/collections">← 返回合辑</a>
+      <a href={`/${collection.category}`} class="post-back-category" style={`color:${categoryColors[collection.category]}`}>
+        {categoryLabels[collection.category]}
+      </a>
+    </nav>
+
+    <header class="collection-header">
+      <div class="collection-meta">
+        <span class="collection-cat-tag" style={`color:${categoryColors[collection.category]}`}>
+          {categoryLabels[collection.category]}
+        </span>
+        <span class="collection-status-tag">
+          {collection.status === 'completed' ? '已完结' : '进行中'}
+        </span>
+        {collection.startDate && <span class="collection-start">{collection.startDate} 起</span>}
+      </div>
+      <h1 class="collection-h1">{collection.title}</h1>
+      <p class="collection-desc">{collection.description}</p>
+    </header>
+
+    <div class="collection-posts">
+      {posts.map((post, i) => {
+        const wc = wordCount(post.body);
+        const rt = Math.max(1, Math.round(wc / 350));
+        return (
+          <a href={`/posts/${post.slug}`} class="collection-post-row">
+            <span class="post-number">{String(post.data.collectionOrder || i + 1).padStart(2, '0')}</span>
+            <div class="post-info">
+              <h3>{post.data.title}</h3>
+              <p>{post.data.excerpt}</p>
+              <div class="post-meta-row">
+                <span>{dateStr(post.data.date)}</span>
+                <span>· 约 {wc} 字 · 预计阅读 {rt} 分钟</span>
+              </div>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .collection-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 0 64px;
+  }
+
+  .post-back {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    font-family: var(--font-serif);
+    font-size: 13px;
+  }
+
+  .post-back a {
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+
+  .post-back a:hover {
+    color: var(--ink);
+  }
+
+  .post-back-category {
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  .collection-header {
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .collection-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-family: var(--font-serif);
+    font-size: 12px;
+  }
+
+  .collection-cat-tag {
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  .collection-status-tag {
+    color: var(--muted);
+  }
+
+  .collection-start {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .collection-h1 {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .collection-desc {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .collection-posts {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .collection-post-row {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+    text-decoration: none;
+    transition: background 0.1s;
+  }
+
+  .collection-post-row:last-child {
+    border-bottom: none;
+  }
+
+  .collection-post-row:hover {
+    background: var(--soft);
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .post-number {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--muted);
+    line-height: 1.3;
+  }
+
+  .post-info h3 {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: 6px;
+  }
+
+  .post-info p {
+    font-family: var(--font-serif);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+
+  .post-meta-row {
+    display: flex;
+    gap: 8px;
+    font-family: var(--font-serif);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 768px) {
+    .collection-page {
+      padding: 20px 0 48px;
+    }
+
+    .collection-h1 {
+      font-size: 23px;
+    }
+
+    .collection-post-row {
+      grid-template-columns: 32px 1fr;
+      gap: 10px;
+      padding: 16px 0;
+    }
+
+    .post-number {
+      font-size: 16px;
+    }
+  }
+</style>
