@@ -4,7 +4,12 @@
 <div id="search-overlay" class="search-overlay" aria-hidden="true">
   <div class="search-panel">
     <div class="search-input-row">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.2">
+          <circle cx="7" cy="7" r="4.5" />
+          <line x1="10.5" y1="10.5" x2="14" y2="14" stroke-linecap="round" />
+        </svg>
+      </span>
       <input id="search-input" type="text" placeholder="搜索..." autocomplete="off" spellcheck="false" />
       <button class="search-esc" type="button" id="search-esc">ESC</button>
     </div>
@@ -66,10 +71,13 @@
 
   .search-icon {
     color: var(--muted);
-    font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .search-icon svg {
+    display: block;
   }
 
   #search-input {

@@ -1,5 +1,6 @@
 import { getCollection } from 'astro:content';
 import type { APIRoute } from 'astro';
+import { renderCoverSVG } from '../lib/cover';
 
 export const GET: APIRoute = async () => {
   const posts = await getCollection('posts');
@@ -15,14 +16,20 @@ export const GET: APIRoute = async () => {
       .replace(/\s+/g, ' ')
       .trim();
 
+    const date = post.data.date;
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
     return {
       slug: post.slug,
       title: post.data.title,
       excerpt: post.data.excerpt,
       category: post.data.category,
-      date: post.data.date.toISOString().split('T')[0],
+      date: date.toISOString().split('T')[0],
+      dateShort: `${month}.${day}`,
       collection: post.data.collection || null,
       content: body.substring(0, 800),
+      coverSvg: renderCoverSVG(post.data, 'sm'),
     };
   });
 
