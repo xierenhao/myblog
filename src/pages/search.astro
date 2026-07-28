@@ -1,0 +1,153 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="搜索 · Bruce Xie Blog" activeNav="">
+  <section class="home-intro">
+    <h1>搜索结果</h1>
+    <p id="search-query-display" style="font-size: 12px; color: var(--muted); margin-top: 8px;"></p>
+  </section>
+
+  <section class="full-width">
+    <div class="section-heading">
+      <h2 id="search-count"></h2>
+    </div>
+    <div id="search-results-list" class="article-list"></div>
+  </section>
+</BaseLayout>
+
+<script is:inline define:vars={{}}>
+  const categoryColors = {
+    ai: '#18c7b7',
+    football: '#f06455',
+    fragments: '#e7b844',
+  };
+
+  const categoryLabels = {
+    ai: 'AI',
+    football: '足球',
+    fragments: '碎片',
+  };
+
+  function escapeHtml(s) {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function parseQuery(raw) {
+    const tokens = [];
+    let cur = '';
+    let inQuote = false;
+    for (let i = 0; i < raw.length; i++) {
+      const c = raw[i];
+      if (c === '"') { inQuote = !inQuote; continue; }
+      if (c === ' ' && !inQuote) {
+        if (cur) tokens.push(cur);
+        cur = '';
+      } else {
+        cur += c;
+      }
+    }
+    if (cur) tokens.push(cur);
+
+    const include = [];
+    const exclude = [];
+    const exact = [];
+    for (const t of tokens) {
+      if (t.startsWith('-') && t.length > 1) {
+        exclude.push(t.slice(1).toLowerCase());
+      } else {
+        exact.push(t.toLowerCase());
+        include.push(t.toLowerCase());
+      }
+    }
+    return { include, exclude, exact };
+  }
+
+  function matchScore(post, q) {
+    const haystack = `${post.title} ${post.excerpt} ${post.content} ${post.category}`.toLowerCase();
+    for (const e of q.exclude) {
+      if (haystack.includes(e)) return 0;
+    }
+    let score = 0;
+    for (const term of q.include) {
+      if (!term) continue;
+      const idx = haystack.indexOf(term);
+      if (idx === -1) return 0;
+      score += 10;
+      if (post.title.toLowerCase().includes(term)) score += 20;
+      if (post.title.toLowerCase().indexOf(term) === 0) score += 10;
+    }
+    return score;
+  }
+
+  function formatDate(d) {
+    return new Date(d).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  async function runSearch() {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q') || '';
+    const queryDisplay = document.getElementById('search-query-display');
+    const countEl = document.getElementById('search-count');
+    const listEl = document.getElementById('search-results-list');
+
+    if (!q.trim()) {
+      queryDisplay.textContent = '请输入搜索关键词';
+      countEl.textContent = '';
+      listEl.innerHTML = '';
+      return;
+    }
+
+    queryDisplay.textContent = `关键词："${q}"`;
+    countEl.textContent = '搜索中...';
+
+    try {
+      const res = await fetch('/search-index.json');
+      const index = await res.json();
+      const parsed = parseQuery(q);
+      const matched = index
+        .map((p) => ({ post: p, score: matchScore(p, parsed) }))
+        .filter((r) => r.score > 0)
+        .sort((a, b) => b.score - a.score);
+
+      countEl.textContent = `${matched.length} 篇文章`;
+
+      if (matched.length === 0) {
+        listEl.innerHTML = `<div style="padding: 24px 0; font-family: var(--font-serif); font-size: 14px; color: var(--muted);">没有找到匹配 "${escapeHtml(q)}" 的文章</div>`;
+        return;
+      }
+
+      listEl.innerHTML = matched.map(({ post }) => {
+        const cat = categoryLabels[post.category] || post.category;
+        const color = categoryColors[post.category] || '#666';
+        const date = formatDate(post.date);
+        const coverChar = post.title.charAt(0);
+
+        return `<a href="/posts/${escapeHtml(post.slug)}" class="article-row-link">
+          <div class="article-row">
+            <div class="cover cover-sm">
+              <div class="cover-svg-wrap" style="background: ${color === '#18c7b7' ? '#132229' : color === '#f06455' ? '#232e2c' : '#1c1c16'}; border-radius: 6px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                <span style="font-family: Georgia, serif; font-size: 20px; color: ${color}; opacity: 0.7;">${escapeHtml(coverChar)}</span>
+              </div>
+            </div>
+            <div class="article-row-copy">
+              <h4>${escapeHtml(post.title)}</h4>
+              <p>${escapeHtml(post.excerpt)}</p>
+            </div>
+            <time>${escapeHtml(date)}</time>
+          </div>
+        </a>`;
+      }).join('');
+    } catch (e) {
+      countEl.textContent = '搜索出错';
+      listEl.innerHTML = '';
+    }
+  }
+
+  runSearch();
+</script>

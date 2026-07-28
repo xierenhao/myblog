@@ -399,10 +399,11 @@
 
   input?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-      const first = results?.querySelector('.search-result-item') as HTMLAnchorElement | null;
-      if (first) {
-        e.preventDefault();
-        first.click();
+      e.preventDefault();
+      const q = input.value.trim();
+      if (q) {
+        closeOverlay();
+        window.location.href = `/search?q=${encodeURIComponent(q)}`;
       }
     }
   });
