@@ -20,8 +20,8 @@ const navItems = [
 ---
 
 <header class="blog-header">
-  <a href="/" class="wordmark" aria-label="Bruce Xie Blog 首页">
-    <strong>Bruce Xie</strong>
+  <a href="/" class="wordmark" aria-label="虾兵xie讲 首页">
+    <strong>虾兵xie讲</strong>
     <span>BLOG</span>
   </a>
   <div class="header-actions">
@@ -60,6 +60,6 @@ const navItems = [
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
     document.documentElement.style.colorScheme = next;
-    try { localStorage.setItem('bruce-xie-blog-theme', next); } catch (e) {}
+    try { localStorage.setItem('xiabing-blog-theme', next); } catch (e) {}
   });
 </script>

@@ -8,7 +8,7 @@ interface Props {
   activeNav?: string;
 }
 
-const { title = 'Bruce Xie Blog', activeNav = '/' } = Astro.props;
+const { title = '虾兵xie讲', activeNav = '/' } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -16,13 +16,13 @@ const { title = 'Bruce Xie Blog', activeNav = '/' } = Astro.props;
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Bruce Xie 的个人 Blog —— 关于 AI 产品的思考，和足球场上的观察。" />
+  <meta name="description" content="虾兵xie讲 —— AI 产品经理的思考阵地，和业余踢球者的场边观察。" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <title>{title}</title>
   <script is:inline>
     (function () {
       try {
-        var saved = localStorage.getItem('bruce-xie-blog-theme');
+        var saved = localStorage.getItem('xiabing-blog-theme');
         var theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         document.documentElement.dataset.theme = theme;
         document.documentElement.style.colorScheme = theme;

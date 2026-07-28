@@ -6,7 +6,7 @@ export async function GET(context) {
   const sorted = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
   return rss({
-    title: 'Bruce Xie Blog',
+    title: '虾兵xie讲',
     description: '研究并实践 AI 如何重塑产品与工作方式。',
     site: context.site,
     items: sorted.map((post) => ({
