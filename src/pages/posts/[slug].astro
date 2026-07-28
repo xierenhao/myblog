@@ -168,7 +168,8 @@ const collectionInfo = post.data.collection ? getCollectionBySlug(post.data.coll
     margin-bottom: 28px;
   }
 
-  .post-cover-wrap .cover {
+  .post-cover-wrap :global(.cover) {
+    height: auto;
     aspect-ratio: 2 / 1;
     border-radius: 8px;
   }
@@ -368,7 +369,8 @@ const collectionInfo = post.data.collection ? getCollectionBySlug(post.data.coll
       line-height: 1.85;
     }
 
-    .post-cover-wrap .cover {
+    .post-cover-wrap :global(.cover) {
+      height: auto;
       aspect-ratio: 2 / 1;
     }
 
