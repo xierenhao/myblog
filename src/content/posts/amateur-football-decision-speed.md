@@ -6,8 +6,8 @@ excerpt: "业余球场水平参差，真正拉开差距的不是技术，而是�
 subtitle: "业余足球的核心竞争力是预判，不是技术"
 collection: "amateur-notes"
 collectionOrder: 2
-coverMotif: "keyword"
-coverKeyword: "SPEED"
+coverMotif: "multiline"
+coverMultiline: [[35, 42, 55, 72, 88], [65, 58, 50, 40, 32]]
 tags: ["野球笔记", "业余足球", "决策"]
 ---
 

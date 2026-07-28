@@ -6,8 +6,8 @@ excerpt: "看球时你是分析师，踢球时你是执行者。理解和执行�
 subtitle: "战术理解的天花板是身体能力，不是知识量"
 collection: "amateur-notes"
 collectionOrder: 1
-coverMotif: "keyword"
-coverKeyword: "PLAY"
+coverMotif: "multiline"
+coverMultiline: [[80, 84, 82, 88, 90], [80, 64, 52, 45, 38]]
 tags: ["野球笔记", "业余足球", "思考"]
 ---
 

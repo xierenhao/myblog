@@ -20,7 +20,7 @@ export const collections: CollectionInfo[] = [
     title: '2026 世界杯复盘',
     description: '从选材到临场逐层拆解法国队为何止步四强——一支靠个人能力硬撑的"野球队伍"。',
     category: 'football',
-    status: 'completed',
+    status: 'ongoing',
     startDate: '2026-07',
   },
   {
