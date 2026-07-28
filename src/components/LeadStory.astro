@@ -1,0 +1,57 @@
+---
+import ArticleCover from './ArticleCover.astro';
+
+interface Post {
+  slug: string;
+  data: {
+    title: string;
+    date: Date;
+    category: 'ai' | 'football' | 'fragments';
+    excerpt: string;
+    subtitle?: string;
+    series?: string;
+    seriesOrder?: number;
+    coverKeyword?: string;
+    coverData?: number[];
+    coverDiagram?: string;
+  };
+}
+
+const { post } = Astro.props as { post: Post };
+
+const categoryColors = {
+  ai: '#18c7b7',
+  football: '#f06455',
+  fragments: '#e7b844',
+};
+
+const categoryLabels = {
+  ai: 'AI',
+  football: '足球',
+  fragments: '碎片',
+};
+
+const color = categoryColors[post.data.category];
+const label = categoryLabels[post.data.category];
+const seriesText = post.data.series
+  ? `${post.data.series} 第${['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][post.data.seriesOrder - 1] || post.data.seriesOrder}篇`
+  : '';
+---
+
+<div class="lead-story">
+  <ArticleCover post={post} size="lg" />
+  <div class="lead-story-copy">
+    <div class="lead-meta">
+      <span class="lead-category" style={`color:${color}`}>{label}</span>
+      {post.data.series && <span class="lead-series">{seriesText}</span>}
+    </div>
+    <a href={`/posts/${post.slug}`}>
+      <h3>{post.data.title}</h3>
+    </a>
+    {post.data.subtitle && <div class="lead-subtitle">{post.data.subtitle}</div>}
+    <div class="lead-excerpt">{post.data.excerpt}</div>
+    <div class="lead-read">
+      <a href={`/posts/${post.slug}`}>开始阅读 →</a>
+    </div>
+  </div>
+</div>

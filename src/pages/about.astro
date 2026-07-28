@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="关于 · Bruce Xie Blog" activeNav="/about">
+  <article class="about-page">
+    <section class="home-intro">
+      <h1>关于</h1>
+    </section>
+
+    <div class="about-content">
+      <p class="about-lead">
+        985本硕，人大数学硕士，ai产品经理。平时思考 AI 如何重塑产品与工作方式，业余写足球战术分析。
+      </p>
+
+      <p class="about-blog-desc">
+        这个 Blog 记录正在形成的判断——关于 agent harness、context window、memory architecture 这些 AI 产品层面的结构性问题，以及 2026 世界杯的战术复盘。
+      </p>
+
+      <p class="about-blog-desc">
+        两条线并行，互不干扰。如果你对其中任何一条感兴趣，可以在上方导航 tab 里找到入口。
+      </p>
+
+      <hr />
+
+      <h2>联系</h2>
+      <div class="contact-list">
+        <div class="contact-item">
+          <span class="contact-label">Email</span>
+          <span class="contact-value">xierenhao729@126.com</span>
+        </div>
+        <div class="contact-item">
+          <span class="contact-label">GitHub</span>
+          <a href="https://github.com/xierenhao" class="contact-value link" target="_blank">https://github.com/xierenhao</a>
+        </div>
+        <div class="contact-item">
+          <span class="contact-label">WeChat</span>
+          <span class="contact-value">ruc_brucegk</span>
+        </div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .about-page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-bottom: 48px;
+  }
+
+  .about-content {
+    padding: 28px 0;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  .about-lead {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .about-blog-desc {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.9;
+    margin-bottom: 18px;
+  }
+
+  .about-content h2 {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 28px 0 12px;
+  }
+
+  .about-content hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 40px 0;
+  }
+
+  .contact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--font-serif);
+    font-size: 15px;
+  }
+
+  .contact-label {
+    font-weight: 500;
+    color: var(--muted);
+    min-width: 64px;
+  }
+
+  .contact-value {
+    color: var(--ink);
+  }
+
+  .contact-value.link {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 2px;
+    transition: text-decoration-color 0.15s;
+  }
+
+  .contact-value.link:hover {
+    text-decoration-color: var(--ink);
+  }
+</style>

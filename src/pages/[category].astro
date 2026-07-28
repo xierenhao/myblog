@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleRow from '../components/ArticleRow.astro';
+import TopicsSidebar from '../components/TopicsSidebar.astro';
+
+export async function getStaticPaths() {
+  const categories = [
+    { slug: 'ai', label: 'AI', desc: '关于 harness、agent、context window 的产品思考。' },
+    { slug: 'football', label: '足球', desc: '2026 世界杯战术复盘与数据分析。' },
+    { slug: 'fragments', label: '碎片', desc: '社媒精选与周度摘录。' },
+  ];
+  return categories.map((c) => ({ params: { category: c.slug }, props: c }));
+}
+
+const { slug, label, desc } = Astro.props;
+const allPosts = await getCollection('posts');
+const posts = allPosts
+  .filter((p) => p.data.category === slug)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout title={`${label} · Bruce Xie Blog`} activeNav={`/${slug}`}>
+  <section class="home-intro">
+    <h1>{label}</h1>
+    <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">{desc}</p>
+  </section>
+
+  <div class="content-grid">
+    <section>
+      <div class="section-heading">
+        <h2>{posts.length} 篇文章</h2>
+      </div>
+      <div class="article-list">
+        {posts.map((post) => <ArticleRow post={post} />)}
+      </div>
+    </section>
+    <TopicsSidebar />
+  </div>
+</BaseLayout>

@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import LeadStory from '../components/LeadStory.astro';
+import ArticleRow from '../components/ArticleRow.astro';
+import TopicsSidebar from '../components/TopicsSidebar.astro';
+
+const allPosts = await getCollection('posts');
+const sorted = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const leadPost = sorted[0];
+const recentPosts = sorted.slice(1, 6);
+---
+
+<BaseLayout title="Bruce Xie Blog" activeNav="/">
+  <section class="home-intro">
+    <h1>研究并实践 AI 如何重塑产品与工作方式，业余球员。</h1>
+  </section>
+
+  <section>
+    <div class="section-heading">
+      <h2>从这里开始</h2>
+      <a href="/articles">阅读路径 →</a>
+    </div>
+    {leadPost && <LeadStory post={leadPost} />}
+  </section>
+
+  <div class="content-grid">
+    <section>
+      <div class="section-heading">
+        <h2>最新文章</h2>
+        <a href="/articles">查看全部 →</a>
+      </div>
+      <div class="article-list">
+        {recentPosts.map((post) => <ArticleRow post={post} />)}
+      </div>
+    </section>
+    <TopicsSidebar />
+  </div>
+</BaseLayout>

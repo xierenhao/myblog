@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleRow from '../components/ArticleRow.astro';
+import TopicsSidebar from '../components/TopicsSidebar.astro';
+
+const allPosts = await getCollection('posts');
+const sorted = allPosts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+---
+
+<BaseLayout title="全部文章 · Bruce Xie Blog" activeNav="/articles">
+  <section class="home-intro">
+    <h1>全部文章</h1>
+  </section>
+
+  <div class="content-grid">
+    <section>
+      <div class="section-heading">
+        <h2>{sorted.length} 篇文章</h2>
+      </div>
+      <div class="article-list">
+        {sorted.map((post) => <ArticleRow post={post} />)}
+      </div>
+    </section>
+    <TopicsSidebar />
+  </div>
+</BaseLayout>

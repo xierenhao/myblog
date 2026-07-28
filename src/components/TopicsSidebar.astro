@@ -1,0 +1,23 @@
+---
+const topics = [
+  { name: 'Harness 与 Agent', color: '#18c7b7', href: '/ai' },
+  { name: 'AI 产品方法', color: '#4263eb', href: '/ai' },
+  { name: '世界杯复盘', color: '#f06455', href: '/football' },
+  { name: '碎片与周报', color: '#e7b844', href: '/fragments' },
+];
+---
+
+<aside class="topics-block">
+  <h2>按主题阅读</h2>
+  <div class="topic-list">
+    {topics.map((t) => (
+      <a href={t.href} class="topic-item">
+        <span class="topic-dot" style={`background:${t.color}`}></span>
+        <span>{t.name}</span>
+      </a>
+    ))}
+  </div>
+  <p class="topics-note">
+    这里记录正在形成的判断——关于 AI 如何重塑产品，以及足球场上的战术博弈。偶尔有值得反复回看的片段。
+  </p>
+</aside>

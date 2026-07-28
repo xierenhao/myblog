@@ -1,0 +1,270 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCover from '../../components/ArticleCover.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+const { title, date, category, excerpt, subtitle, series, seriesOrder } = post.data;
+
+const categoryColors = {
+  ai: '#18c7b7',
+  football: '#f06455',
+  fragments: '#e7b844',
+};
+
+const categoryLabels = {
+  ai: 'AI',
+  football: '足球',
+  fragments: '碎片',
+};
+
+const dateStr = date.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const seriesText = series
+  ? `${series} 第${['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'][seriesOrder - 1] || seriesOrder}篇`
+  : '';
+
+// Word count + reading time (Chinese: ~350 chars/min)
+const stripped = (post.body || '')
+  .replace(/^---[\s\S]+?---/, '')
+  .replace(/```[\s\S]+?```/g, ' ')
+  .replace(/`[^`]+`/g, ' ')
+  .replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')
+  .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+  .replace(/[#>*_~|\-]/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+const chineseChars = (stripped.match(/[\u4e00-\u9fa5]/g) || []).length;
+const otherTokens = (stripped.match(/[a-zA-Z0-9]+/g) || []).length;
+const wordCount = chineseChars + otherTokens;
+const readingTime = Math.max(1, Math.round(wordCount / 350));
+---
+
+<BaseLayout title={`${title} · Bruce Xie Blog`} activeNav={`/${category}`}>
+  <article class="post-article">
+    <nav class="post-back">
+      <a href="/articles">← 返回</a>
+      <a href={`/${category}`} class="post-back-category" style={`color:${categoryColors[category]}`}>{categoryLabels[category]}</a>
+    </nav>
+
+    <div class="post-cover-wrap">
+      <ArticleCover post={post} size="lg" />
+    </div>
+
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-category" style={`color:${categoryColors[category]}`}>{categoryLabels[category]}</span>
+        {series && <span class="post-series">{seriesText}</span>}
+        <span class="post-date">{dateStr}</span>
+        <span class="post-stats">· 约 {wordCount} 字 · 预计阅读时间 {readingTime} 分钟</span>
+      </div>
+      <h1 class="post-title">{title}</h1>
+      {subtitle && <p class="post-subtitle">{subtitle}</p>}
+    </header>
+
+    <div class="post-content">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-back {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    font-family: var(--font-serif);
+    font-size: 13px;
+  }
+
+  .post-back a {
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+
+  .post-back a:hover {
+    color: var(--ink);
+  }
+
+  .post-back-category {
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  .post-article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 0 64px;
+  }
+
+  .post-cover-wrap {
+    margin-bottom: 28px;
+  }
+
+  .post-cover-wrap .cover {
+    height: 160px;
+    border-radius: 8px;
+  }
+
+  .post-header {
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    margin-bottom: 18px;
+    font-family: var(--font-serif);
+    font-size: 12px;
+  }
+
+  .post-category {
+    font-weight: 500;
+    letter-spacing: 0.03em;
+  }
+
+  .post-series {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .post-date {
+    color: var(--muted);
+  }
+
+  .post-stats {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .post-title {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+  }
+
+  .post-subtitle {
+    font-family: var(--font-serif);
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  .post-content {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 2.2;
+    color: var(--text);
+  }
+
+  .post-content h2 {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 56px 0 32px;
+    letter-spacing: -0.005em;
+  }
+
+  .post-content h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 40px 0 28px;
+  }
+
+  .post-content p {
+    margin-bottom: 28px;
+  }
+
+  .post-content strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .post-content blockquote {
+    border-left: 3px solid var(--line);
+    padding: 4px 0 4px 18px;
+    margin: 24px 0;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .post-content ul, .post-content ol {
+    padding-left: 22px;
+    margin-bottom: 18px;
+  }
+
+  .post-content li {
+    margin-bottom: 10px;
+  }
+
+  .post-content code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--soft);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .post-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 22px 0;
+    font-size: 14px;
+  }
+
+  .post-content th, .post-content td {
+    border-bottom: 1px solid var(--line);
+    padding: 8px 12px;
+    text-align: left;
+  }
+
+  .post-content th {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  @media (max-width: 768px) {
+    .post-article {
+      padding: 20px 0 48px;
+    }
+
+    .post-title {
+      font-size: 23px;
+    }
+
+    .post-content {
+      font-size: 15px;
+      line-height: 1.85;
+    }
+
+    .post-cover-wrap .cover {
+      height: 100px;
+    }
+  }
+</style>
